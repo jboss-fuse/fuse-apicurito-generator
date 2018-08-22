@@ -1,0 +1,8 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Example",
+    "description": "A simple api document",
+    "version": "1.0.0"
+  }
+}
