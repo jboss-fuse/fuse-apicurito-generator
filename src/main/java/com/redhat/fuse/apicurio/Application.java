@@ -15,35 +15,43 @@
  */
 package com.redhat.fuse.apicurio;
 
-import java.util.List;
+import java.util.Arrays;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.swagger.Swagger2Feature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.embedded.undertow.UndertowDeploymentInfoCustomizer;
-import org.springframework.boot.context.embedded.undertow.UndertowEmbeddedServletContainerFactory;
 import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
+
+import com.redhat.fuse.apicurio.resources.GenerateFuseProjectResource;
 
 @SpringBootApplication()
 public class Application extends SpringBootServletInitializer {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Application.class);
+
+    @Autowired
+    private Bus bus;
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
 
+
     @Bean
-    @Autowired
-    public UndertowEmbeddedServletContainerFactory embeddedServletContainerFactory(List<UndertowDeploymentInfoCustomizer> customizers) {
-        UndertowEmbeddedServletContainerFactory factory = new UndertowEmbeddedServletContainerFactory();
-        for (UndertowDeploymentInfoCustomizer customizer : customizers) {
-            factory.addDeploymentInfoCustomizers(customizer);
-        }
-        return factory;
+    public Server rsServer() {
+        // setup CXF-RS
+        JAXRSServerFactoryBean endpoint = new JAXRSServerFactoryBean();
+        endpoint.setBus(bus);
+        endpoint.setServiceBeans(Arrays.asList(new GenerateFuseProjectResource()));
+        endpoint.setAddress("/");
+        endpoint.setFeatures(Arrays.asList(new Swagger2Feature()));
+        return endpoint.create();
     }
 
 

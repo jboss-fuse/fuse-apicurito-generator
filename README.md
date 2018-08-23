@@ -1,8 +1,9 @@
 # Fuse Apicurito Generator
 
-This project implements Fuse specific project generators that the 
-[Apicurito](https://github.com/Apicurio/apicurito) project can be 
-configued to use.
+This project implements Fuse specific project generators that the
+[Apicurito](https://github.com/Apicurio/apicurito) project can be
+configured to use.
+
 
 # Building
 
@@ -14,8 +15,9 @@ configued to use.
 
 # Testing with Curl
 
-Assuming you create an open OpenAPI file called `api.json`:
+Assuming you create an open OpenAPI file called `api.json` and you want
+to generate file called `example.zip`, then you would run the following:
 
-     curl -X POST -H "Content-Type: application/json" \
+     curl -s -X POST -H "Content-Type: application/json" \
           -d @api.json http://localhost:8080/api/v1/generate/camel-project.zip \
-          -o project.zip
+          -o example.zip
