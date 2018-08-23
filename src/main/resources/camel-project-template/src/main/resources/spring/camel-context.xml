@@ -5,14 +5,45 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://camel.apache.org/schema/spring       http://camel.apache.org/schema/spring/camel-spring.xsd">
 
-    <!-- You could also define a traditional camel context here -->
-    <!--
     <camelContext xmlns="http://camel.apache.org/schema/spring">
+
+        <onException>
+            <exception>java.lang.Exception</exception>
+            <handled><constant>true</constant></handled>
+            <setHeader headerName="Exchange.HTTP_RESPONSE_CODE">
+                <constant>500</constant>
+            </setHeader>
+            <setBody>
+                <simple>${exception.message}\n</simple>
+            </setBody>
+        </onException>
+
+        <restConfiguration component="servlet"/>
+
+        <rest path="/" enableCORS="true">
+            <get id="openapi.json" produces="application/json" uri="openapi.json">
+                <description>Gets the openapi document for this service</description>
+                <route>
+                    <setBody>
+                        <simple>resource:classpath:openapi.json</simple>
+                    </setBody>
+                </route>
+            </get>
+        </rest>
+
+        <rest path="{{swagger.basePath}}" bindingMode="json" enableCORS="true">
+{{& restXML}}
+
+        {{#directEndpoints}}
         <route>
-            <from uri="timer://foo?period=1000"/>
-            <setBody><simple>Hello World from camel-contex.xml</simple></setBody>
-            <log message=">>> ${body}"/>
+            <from uri="{{.}}"/>
+            <log message="API operation not yet implemented: ${headers.CamelHttpMethod} ${headers.CamelHttpPath}"/>
+            <setHeader headerName="Exchange.HTTP_RESPONSE_CODE">
+              <constant>501</constant>
+            </setHeader>
+            <setBody><simple>API operation not implemented: ${headers.CamelHttpMethod} ${headers.CamelHttpPath}</simple></setBody>
         </route>
+        {{/directEndpoints}}
+
     </camelContext>
-    -->
 </beans>

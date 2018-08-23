@@ -2,6 +2,10 @@ camel:
   springboot:
     # The Camel context name
     name: {{title}}
+  component:
+    servlet:
+      mapping:
+        contextPath: /*
 
 # Binding health checks to a different port
 management:

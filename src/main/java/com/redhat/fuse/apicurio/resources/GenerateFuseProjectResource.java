@@ -25,7 +25,12 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -43,6 +48,7 @@ import org.jboss.shrinkwrap.api.GenericArchive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.Asset;
 import org.jboss.shrinkwrap.api.asset.ClassLoaderAsset;
+import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.springframework.stereotype.Component;
 
@@ -90,7 +96,7 @@ public class GenerateFuseProjectResource {
     @Path(value = "/camel-project.zip")
     public InputStream generate() throws Exception {
         try (InputStream openapiDoc = getClass().getResourceAsStream("open-api-example.json")) {
-            return generate(openapiDoc);
+            return generate(readUTF8(openapiDoc));
         }
     }
 
@@ -103,13 +109,9 @@ public class GenerateFuseProjectResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     @Path(value = "/camel-project.zip")
-    public InputStream generate(InputStream openapiDoc) throws Exception {
+    public InputStream generate(String openapiDoc) throws Exception {
 
         final Swagger swagger = new SwaggerParser().read(Json.mapper().readTree(openapiDoc));
-        final CamelContext camel = new DefaultCamelContext();
-        RestDslXmlGenerator restDslXmlGenerator = RestDslGenerator.toXml(swagger);
-        final String xml = restDslXmlGenerator.generate(camel);
-        System.out.println(xml);
 
         GenericArchive archive = ShrinkWrap.create(GenericArchive.class, "camel-project.zip");
 
@@ -119,15 +121,16 @@ public class GenerateFuseProjectResource {
         }
         String artifactId = title.toLowerCase().replaceAll("[^a-zA-Z0-9-_]+", "-").replaceAll("-+", "-");
 
-        HashMap<String, Object> temlateVariables = new HashMap<>();
-        temlateVariables.put("swagger", swagger);
-        temlateVariables.put("title", title);
-        temlateVariables.put("artifactId", artifactId);
-        temlateVariables.put("fuseVersion", FUSE_VERSION);
+        HashMap<String, Object> variables = new HashMap<>();
+        variables.put("swagger", swagger);
+        variables.put("title", title);
+        variables.put("artifactId", artifactId);
+        variables.put("fuseVersion", FUSE_VERSION);
 
-        addTemplateResource(archive, "README.md", temlateVariables);
-        addTemplateResource(archive, "pom.xml", temlateVariables);
-        addTemplateResource(archive, "src/main/resources/application.yml", temlateVariables);
+
+        addTemplateResource(archive, "README.md", variables);
+        addTemplateResource(archive, "pom.xml", variables);
+        addTemplateResource(archive, "src/main/resources/application.yml", variables);
 
 
         addStaticResource(archive, "configuration/settings.xml");
@@ -135,23 +138,74 @@ public class GenerateFuseProjectResource {
         addStaticResource(archive, "src/main/fabric8/service.yml");
         addStaticResource(archive, "src/main/java/io/example/openapi/Application.java");
 
-        // Todo: add the rest of a camel project to the archive.
+        String camelContextXML = generateCamelContextXML(variables);
+        archive.add(new StringAsset(camelContextXML), "src/main/resources/spring/camel-context.xml");
+        archive.add(new StringAsset(openapiDoc), "src/main/resources/openapi.json");
 
         return archive.as(ZipExporter.class).exportAsInputStream();
     }
 
-    private void addTemplateResource(GenericArchive archive, String fileName, Object context) throws IOException {
+    public String generateCamelContextXML(HashMap<String, Object> variables) throws Exception {
+
+        Swagger swagger = (Swagger) variables.get("swagger");
+        final CamelContext camel = new DefaultCamelContext();
+        String restXML = RestDslGenerator.toXml(swagger).generate(camel);
+
+        // Trim off the root elements of the generated XML
+        restXML = restXML.trim();
+        restXML = restXML.replaceFirst(Pattern.quote(
+                "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
+                        "<rests xmlns=\"http://camel.apache.org/schema/spring\">\n"), "");
+        restXML = trimSuffix(restXML, "</rests>");
+        restXML = indent(restXML, "    ");
+        restXML = trimPrefix(restXML, "        <rest>");
+
+        variables.put("restXML", restXML);
+
+        // Extract the direct endpoint names..
+        // <to uri="direct:updateUser"/>
+        ArrayList<String> directEndpoints = new ArrayList<>();
+        for (String line : restXML.split("\n")) {
+            Matcher matcher = Pattern.compile(".*?<to uri=\"(direct:[^\"]+)\"/>.*", Pattern.DOTALL).matcher(line);
+            if (matcher.matches()) {
+                directEndpoints.add(matcher.group(1));
+            }
+        }
+        variables.put("directEndpoints", directEndpoints);
+        return renderTemplateResource("src/main/resources/spring/camel-context.xml", variables);
+    }
+
+    private String indent(String text, String linePrefix) {
+        return Arrays.asList(text.split("\n"))
+                .stream()
+                .map(line -> linePrefix + line)
+                .collect(Collectors.joining("\n"));
+    }
+
+    private static String trimSuffix(String value, String suffix) {
+        if (value == null || suffix == null) {
+            return null;
+        }
+        if (value.endsWith(suffix)) {
+            return value.substring(0, value.length() - suffix.length());
+        }
+        return value;
+    }
+
+    private static String trimPrefix(String value, String prefix) {
+        if (value == null || prefix == null) {
+            return null;
+        }
+        if (value.startsWith(prefix)) {
+            return value.substring(prefix.length());
+        }
+        return value;
+    }
+
+    static private void addTemplateResource(GenericArchive archive, String fileName, Object context) throws IOException {
         archive.add((Asset) () -> {
-            StringWriter sw = null;
             try {
-                MustacheFactory mf = new DefaultMustacheFactory();
-
-                String template = readUTF8Resource("camel-project-template/" + fileName);
-                Mustache mustache = mf.compile(new StringReader(template), fileName);
-
-                sw = new StringWriter();
-                mustache.execute(new PrintWriter(sw), context).flush();
-                String templateResult = sw.toString();
+                String templateResult = renderTemplateResource(fileName, context);
                 return new ByteArrayInputStream(templateResult.getBytes(UTF_8));
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -159,7 +213,18 @@ public class GenerateFuseProjectResource {
         }, fileName);
     }
 
-    static private String readUTF8Resource(String resourceName) throws IOException {
+    private static String renderTemplateResource(String templateResource, Object variables) throws IOException {
+        MustacheFactory mf = new DefaultMustacheFactory();
+
+        String template = readUTF8Resource("camel-project-template/" + templateResource);
+        Mustache mustache = mf.compile(new StringReader(template), templateResource);
+
+        StringWriter sw = new StringWriter();
+        mustache.execute(new PrintWriter(sw), variables).flush();
+        return sw.toString();
+    }
+
+    private static String readUTF8Resource(String resourceName) throws IOException {
         if (resourceName == null) {
             return null;
         }
