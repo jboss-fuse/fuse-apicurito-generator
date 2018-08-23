@@ -5,25 +5,17 @@
 
 ### Building
 
-The project can be built with
+    mvn clean package
 
-    mvn clean install
+### Running Locally
 
-### Runnign the project localy
+    mvn spring-boot:run
 
-The project can be built with
+Getting the API docs:
 
-    mvn clean install
+    curl http://localhost:8080/openapi.json
 
-### Running the project in OpenShift
+## Running on OpenShift
 
-It is assumed that:
-- OpenShift platform is already running, if not you can find details how to [Install OpenShift at your site](https://docs.openshift.com/container-platform/3.3/install_config/index.html).
-- Your system is configured for Fabric8 Maven Workflow, if not you can find a [Get Started Guide](https://access.redhat.com/documentation/en/red-hat-jboss-middleware-for-openshift/3/single/red-hat-jboss-fuse-integration-services-20-for-openshift/)
+    mvn fabric8:deploy
 
-### Accessing the REST service
-
-
-### Swagger API
-
-The project provides API documentation of the service using the _context-path_ `/api-doc.json`. 
