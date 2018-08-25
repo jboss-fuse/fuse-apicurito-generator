@@ -7,7 +7,5 @@ metadata:
     api.service.kubernetes.io/description-language : SwaggerJSON
     api.service.kubernetes.io/description-path: swagger.json
     api.service.kubernetes.io/path:
-  labels:
-    expose: "false"
 spec:
   type: LoadBalancer

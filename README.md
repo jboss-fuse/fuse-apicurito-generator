@@ -41,10 +41,8 @@ See the `README.md` in zip file for more details about the generate project.
 
 ## Testing with Curl against OpenShift
 
-First, we lets expose the service externally and store the hostname where
-that service can addressed with:
+Firstly lets figure out the hostname where the service is running:
 
-    oc expose svc fuse-apicurito-generator
     APPHOST=$(oc get route fuse-apicurito-generator --template={{.spec.host}})
 
 Assuming you create an open OpenAPI file called `api.json` and you want
