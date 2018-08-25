@@ -1,0 +1,13 @@
+kind: Service
+name: 
+metadata:
+  annotations:
+    api.service.kubernetes.io/scheme: http
+    api.service.kubernetes.io/protocol: REST
+    api.service.kubernetes.io/description-language : SwaggerJSON
+    api.service.kubernetes.io/description-path: swagger.json
+    api.service.kubernetes.io/path:
+  labels:
+    expose: "false"
+spec:
+  type: LoadBalancer
