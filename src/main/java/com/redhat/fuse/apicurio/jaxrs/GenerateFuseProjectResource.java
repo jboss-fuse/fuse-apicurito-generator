@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.redhat.fuse.apicurio.resources;
+package com.redhat.fuse.apicurio.jaxrs;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -41,7 +40,6 @@ import javax.ws.rs.core.MediaType;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.generator.swagger.RestDslGenerator;
-import org.apache.camel.generator.swagger.RestDslXmlGenerator;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.commons.io.IOUtils;
 import org.jboss.shrinkwrap.api.GenericArchive;

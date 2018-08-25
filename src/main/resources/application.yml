@@ -16,6 +16,9 @@
 
 cxf:
   path: /
+  jaxrs:
+    component-scan: true
+    classes-scan-packages: com.redhat.fuse.apicurio.resources
 
 server:
   undertow:

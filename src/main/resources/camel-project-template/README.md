@@ -19,3 +19,11 @@ Getting the API docs:
 
     mvn fabric8:deploy
 
+You can expose the service externally using the following command:
+
+    oc expose svc {{artifactId}}
+
+And then you can access it's OpenAPI docs hosted by the service at:
+{{=<% %>=}}
+    curl -s http://$(oc get route <% artifactId %> --template={{.spec.host}})/openapi.json
+<%={{ }}=%>

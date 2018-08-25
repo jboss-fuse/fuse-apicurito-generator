@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.redhat.fuse.apicurio;
+package com.redhat.fuse.apicurio.jaxrs;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.support.SpringBootServletInitializer;
+import org.apache.cxf.annotations.Provider;
+import org.apache.cxf.jaxrs.swagger.Swagger2Feature;
 
-@SpringBootApplication()
-public class Application extends SpringBootServletInitializer {
-    public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
-    }
+/**
+ * Enables the Swagger2Feature so that the /swagger.json endpoint is
+ * exposed.
+ */
+@Provider(value = Provider.Type.Feature, scope = Provider.Scope.Server)
+public class OpenAPIFeature extends Swagger2Feature {
 }

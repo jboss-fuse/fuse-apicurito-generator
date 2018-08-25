@@ -14,7 +14,7 @@
                 <constant>500</constant>
             </setHeader>
             <setBody>
-                <simple>${exception.message}\n</simple>
+                <simple>${exception.message}</simple>
             </setBody>
         </onException>
 
@@ -37,13 +37,18 @@
         {{#directEndpoints}}
         <route>
             <from uri="{{.}}"/>
+            <to uri="direct:501"/>
+        </route>
+        {{/directEndpoints}}
+
+        <route>
+            <from uri="direct:501"/>
             <log message="API operation not yet implemented: ${headers.CamelHttpMethod} ${headers.CamelHttpPath}"/>
             <setHeader headerName="Exchange.HTTP_RESPONSE_CODE">
-              <constant>501</constant>
+                <constant>501</constant>
             </setHeader>
             <setBody><simple>API operation not implemented: ${headers.CamelHttpMethod} ${headers.CamelHttpPath}</simple></setBody>
         </route>
-        {{/directEndpoints}}
 
     </camelContext>
 </beans>
