@@ -32,7 +32,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <image.fuse-apicurito-generator>fuse/fuse-apicurito-generator:%l</image.fuse-apicurito-generator>
+        <image.fuse-apicurito-generator>apicurio/fuse-apicurito-generator:%l</image.fuse-apicurito-generator>
         <fabric8.generator.name>${image.fuse-apicurito-generator}</fabric8.generator.name>
 
         <!-- Build properties (overridable in profiles) -->
