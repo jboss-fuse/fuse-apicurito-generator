@@ -39,7 +39,6 @@
         <enforcer.pluginVersions.banSnapshots>false</enforcer.pluginVersions.banSnapshots>
 
         <fuse.version>7.1.0.fuse-710019</fuse.version>
-        <syndesis.version>1.5.3</syndesis.version>
         <camel.version>2.21.0.fuse-710018</camel.version>
         <snakeyaml.version>1.21</snakeyaml.version>
 
