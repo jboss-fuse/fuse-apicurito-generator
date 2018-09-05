@@ -80,7 +80,7 @@ public class GenerateFuseProjectResource {
             // We hit this case when running in an IDE since it likely will not
             // do the resource filtering on the fuse-version.txt file.  So set it
             // to something we can test with.
-            fuseVersion = "7.1.0.fuse-710019";
+            fuseVersion = "7.1.0.fuse-710019-redhat-00002";
         }
         FUSE_VERSION = fuseVersion;
     }
