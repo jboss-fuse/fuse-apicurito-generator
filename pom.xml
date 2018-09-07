@@ -41,6 +41,7 @@
         <fuse.version>7.1.0.fuse-710019</fuse.version>
         <camel.version>2.21.0.fuse-710018</camel.version>
         <snakeyaml.version>1.21</snakeyaml.version>
+        <junit.version>4.12</junit.version>
 
     </properties>
 
@@ -363,6 +364,12 @@
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
             <version>${snakeyaml.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
         </dependency>
         <!--
         <dependency>
