@@ -151,9 +151,8 @@ public class GenerateFuseProjectResource {
 
         // Trim off the root elements of the generated XML
         restXML = restXML.trim();
-        restXML = restXML.replaceFirst(Pattern.quote(
-                "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
-                        "<rests xmlns=\"http://camel.apache.org/schema/spring\">\n"), "");
+        restXML = restXML.replaceFirst("\\<\\?xml(.+?)\\?\\>", "").trim();
+        restXML = restXML.replaceFirst("<rests xmlns=\"http://camel.apache.org/schema/spring\">", "");
         restXML = trimSuffix(restXML, "</rests>");
         restXML = indent(restXML, "    ");
         restXML = trimPrefix(restXML, "        <rest>");
