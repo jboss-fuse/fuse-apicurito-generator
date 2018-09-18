@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/jboss-fuse/fuse-apicurito-generator.svg?style=svg)](https://circleci.com/gh/jboss-fuse/fuse-apicurito-generator)
+
 # Fuse Apicurito Generator
 
 This project implements Fuse specific project generators that the
