@@ -63,5 +63,5 @@ See the `README.md` in zip file for more details about the generate project.
 
 ## Building and Pushing the Image to Dockerhub
 
-    mvn clean package -Pfabric8.mode=kubernetes fabric8:build
+    mvn clean package -Dfabric8.mode=kubernetes fabric8:build
     docker push apicurio/fuse-apicurito-generator:latest
