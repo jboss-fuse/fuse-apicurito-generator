@@ -24,6 +24,9 @@
             <get id="openapi.json" produces="application/json" uri="openapi.json">
                 <description>Gets the openapi document for this service</description>
                 <route>
+                    <setHeader headerName="Exchange.CONTENT_TYPE">
+                        <constant>application/vnd.oai.openapi+json</constant>
+                    </setHeader>
                     <setBody>
                         <simple>resource:classpath:openapi.json</simple>
                     </setBody>
@@ -32,7 +35,8 @@
         </rest>
 
         <rest path="{{swagger.basePath}}" bindingMode="json" enableCORS="true">
-{{& restXML}}
+        {{& restXML}}
+        </rest>
 
         {{#directEndpoints}}
         <route>

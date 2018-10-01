@@ -39,6 +39,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.camel.CamelContext;
+import org.apache.camel.Exchange;
 import org.apache.camel.generator.swagger.RestDslGenerator;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.commons.io.IOUtils;
@@ -133,7 +134,6 @@ public class GenerateFuseProjectResource {
 
         addStaticResource(archive, "configuration/settings.xml");
         addStaticResource(archive, "src/main/fabric8/deployment.yml");
-        addStaticResource(archive, "src/main/fabric8/service.yml");
         addStaticResource(archive, "src/main/java/io/example/openapi/Application.java");
 
         String camelContextXML = generateCamelContextXML(variables);
@@ -151,11 +151,12 @@ public class GenerateFuseProjectResource {
 
         // Trim off the root elements of the generated XML
         restXML = restXML.trim();
-        restXML = restXML.replaceFirst("\\<\\?xml(.+?)\\?\\>", "").trim();
-        restXML = restXML.replaceFirst("<rests xmlns=\"http://camel.apache.org/schema/spring\">", "");
-        restXML = trimSuffix(restXML, "</rests>");
+        restXML = trimPrefix(restXML, "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>").trim();
+        restXML = trimPrefix(restXML, "<rests xmlns=\"http://camel.apache.org/schema/spring\">").trim();
+        restXML = trimSuffix(restXML, "</rests>").trim();
+        restXML = trimPrefix(restXML, "<rest>").trim();
+        restXML = trimSuffix(restXML, "</rest>").trim();
         restXML = indent(restXML, "    ");
-        restXML = trimPrefix(restXML, "        <rest>");
 
         variables.put("restXML", restXML);
 
