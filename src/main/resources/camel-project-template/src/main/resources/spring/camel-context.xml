@@ -18,7 +18,7 @@
             </setBody>
         </onException>
 
-        <restConfiguration component="servlet"/>
+        <restConfiguration component="servlet" apiContextPath="/openapi.json"/>
 
         <rest path="/" enableCORS="true">
             <get id="openapi.json" produces="application/json" uri="openapi.json">
