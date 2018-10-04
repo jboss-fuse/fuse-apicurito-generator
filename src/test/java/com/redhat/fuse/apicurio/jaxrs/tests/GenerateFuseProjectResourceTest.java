@@ -86,6 +86,14 @@ public class GenerateFuseProjectResourceTest {
 		assertEquals(1, xmlHeaders);
 	}
 
+	@Test
+	public void testForUniqueIDsInGeneratedRestDSLOutput() throws Exception {
+		String camelContextXML = getRestDSLXMLFromSwagger("src/test/resources/petstore-swagger.json");
+		assertTrue(camelContextXML != null && camelContextXML.trim().length() > 0);
+		int placeholders = StringUtils.countMatches(camelContextXML, "{{uuid}}");
+		assertEquals(0, placeholders);
+	}
+
 	private static String readUTF8(InputStream is) throws IOException {
 		if (is == null) {
 			return null;

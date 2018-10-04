@@ -5,7 +5,7 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://camel.apache.org/schema/spring       http://camel.apache.org/schema/spring/camel-spring.xsd">
 
-    <camelContext xmlns="http://camel.apache.org/schema/spring">
+    <camelContext id="context1" xmlns="http://camel.apache.org/schema/spring">
 
         <onException>
             <exception>java.lang.Exception</exception>
@@ -20,38 +20,40 @@
 
         <restConfiguration component="servlet" apiContextPath="/openapi.json"/>
 
-        <rest path="/" enableCORS="true">
+        <rest id="rest1" path="/" enableCORS="true">
             <get id="openapi.json" produces="application/json" uri="openapi.json">
                 <description>Gets the openapi document for this service</description>
-                <route>
-                    <setHeader headerName="Exchange.CONTENT_TYPE">
+                <route id="rest1-route1">
+                    <setHeader id="setHeader-route1" headerName="Exchange.CONTENT_TYPE">
                         <constant>application/vnd.oai.openapi+json</constant>
                     </setHeader>
-                    <setBody>
+                    <setBody id="setBody-route1">
                         <simple>resource:classpath:openapi.json</simple>
                     </setBody>
                 </route>
             </get>
         </rest>
 
-        <rest path="{{swagger.basePath}}" bindingMode="json" enableCORS="true">
+        <rest id="rest2" path="{{swagger.basePath}}" bindingMode="json" enableCORS="true">
         {{& restXML}}
         </rest>
 
         {{#directEndpoints}}
-        <route>
-            <from uri="{{.}}"/>
-            <to uri="direct:501"/>
+        <route id="route-{{uuid}}">
+            <from id="from-{{uuid}}" uri="{{.}}"/>
+            <to id="to-{{uuid}}" uri="direct:501"/>
         </route>
         {{/directEndpoints}}
 
-        <route>
-            <from uri="direct:501"/>
-            <log message="API operation not yet implemented: ${headers.CamelHttpMethod} ${headers.CamelHttpPath}"/>
-            <setHeader headerName="Exchange.HTTP_RESPONSE_CODE">
+        <route id="route2">
+            <from id="from-route2" uri="direct:501"/>
+            <log id="log-route2" message="API operation not yet implemented: ${headers.CamelHttpMethod} ${headers.CamelHttpPath}"/>
+            <setHeader id="setHeader-route2" headerName="Exchange.HTTP_RESPONSE_CODE">
                 <constant>501</constant>
             </setHeader>
-            <setBody><simple>API operation not implemented: ${headers.CamelHttpMethod} ${headers.CamelHttpPath}</simple></setBody>
+            <setBody id="setBody-route2">
+                <simple>API operation not implemented: ${headers.CamelHttpMethod} ${headers.CamelHttpPath}</simple>
+            </setBody>
         </route>
 
     </camelContext>
