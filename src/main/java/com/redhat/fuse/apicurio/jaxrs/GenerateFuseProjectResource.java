@@ -30,6 +30,8 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.UUID;
+import java.util.function.Function;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -39,7 +41,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.camel.CamelContext;
-import org.apache.camel.Exchange;
 import org.apache.camel.generator.swagger.RestDslGenerator;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.commons.io.IOUtils;
@@ -85,6 +86,8 @@ public class GenerateFuseProjectResource {
         }
         FUSE_VERSION = fuseVersion;
     }
+    
+    Function<String, String> generateuuid = (s) -> UUID.randomUUID().toString();
 
     /**
      * Generate an example zip file containing a camel project for an example
@@ -125,12 +128,11 @@ public class GenerateFuseProjectResource {
         variables.put("title", title);
         variables.put("artifactId", artifactId);
         variables.put("fuseVersion", FUSE_VERSION);
-
+        variables.put("uuid", generateuuid);
 
         addTemplateResource(archive, "README.md", variables);
         addTemplateResource(archive, "pom.xml", variables);
         addTemplateResource(archive, "src/main/resources/application.yml", variables);
-
 
         addStaticResource(archive, "configuration/settings.xml");
         addStaticResource(archive, "src/main/fabric8/deployment.yml");
@@ -243,5 +245,4 @@ public class GenerateFuseProjectResource {
     static private void addStaticResource(GenericArchive archive, String fileName) {
         archive.add(new ClassLoaderAsset("camel-project-template/" + fileName), fileName);
     }
-
 }
