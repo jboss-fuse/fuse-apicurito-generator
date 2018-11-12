@@ -81,7 +81,8 @@ public class GenerateFuseProjectResourceTest {
 	@Test
 	public void testForDuplicateXMLHeadersInGeneratedRestDSLOutput() throws Exception {
 		String camelContextXML = getRestDSLXMLFromSwagger("src/test/resources/petstore-swagger.json");
-		assertTrue(camelContextXML != null && camelContextXML.trim().length() > 0);
+		assertTrue(camelContextXML != null);
+		assertTrue(camelContextXML.trim().length() > 0);
 		int xmlHeaders = StringUtils.countMatches(camelContextXML, "<?xml version=\"1.0\" encoding=\"UTF-8\"");
 		assertEquals(1, xmlHeaders);
 	}
@@ -89,9 +90,17 @@ public class GenerateFuseProjectResourceTest {
 	@Test
 	public void testForUniqueIDsInGeneratedRestDSLOutput() throws Exception {
 		String camelContextXML = getRestDSLXMLFromSwagger("src/test/resources/petstore-swagger.json");
-		assertTrue(camelContextXML != null && camelContextXML.trim().length() > 0);
+		assertTrue(camelContextXML != null);
+		assertTrue(camelContextXML.trim().length() > 0);
 		int placeholders = StringUtils.countMatches(camelContextXML, "{{uuid}}");
 		assertEquals(0, placeholders);
+	}
+
+	@Test
+	public void testForRestDSLOutputFromSimpleOpenAPIFile() throws Exception {
+		String camelContextXML = getRestDSLXMLFromSwagger("src/test/resources/simple-swagger.json");
+		assertTrue(camelContextXML != null);
+		assertTrue(camelContextXML.trim().length() > 0);
 	}
 
 	private static String readUTF8(InputStream is) throws IOException {
