@@ -30,6 +30,7 @@ jobs:
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
 
+      - run: mvn --version
       - run: mvn dependency:go-offline
 
       - save_cache:
@@ -38,5 +39,5 @@ jobs:
           key: v1-dependencies-{{ checksum "pom.xml" }}
         
       # build and run tests
-      - run: mvn clean package
+      - run: mvn clean package -Djdk.net.URLClassPath.disableClassPathURLCheck=true
 
