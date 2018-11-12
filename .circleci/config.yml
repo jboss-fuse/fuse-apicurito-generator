@@ -39,5 +39,5 @@ jobs:
           key: v1-dependencies-{{ checksum "pom.xml" }}
         
       # build and run tests
-      - run: mvn clean package -Djdk.net.URLClassPath.disableClassPathURLCheck=true
+      - run: mvn clean package
 
