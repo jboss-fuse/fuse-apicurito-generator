@@ -20,14 +20,14 @@
 
         <restConfiguration component="servlet" apiContextPath="/openapi.json"/>
 
-        <rest id="rest-{{uuid}}" path="/" enableCORS="true">
+        <rest id="rest-for-openapi-document" path="/" enableCORS="true">
             <get id="openapi.json" produces="application/json" uri="openapi.json">
-                <description>Gets the openapi document for this service</description>
-                <route id="route-{{uuid}}">
-                    <setHeader id="setHeader-{{uuid}}" headerName="Exchange.CONTENT_TYPE">
+                <description>Gets the OpenAPI document for this service</description>
+                <route id="route-for-openapi-document">
+                    <setHeader id="setHeader-for-openapi-document" headerName="Exchange.CONTENT_TYPE">
                         <constant>application/vnd.oai.openapi+json</constant>
                     </setHeader>
-                    <setBody id="setBody-{{uuid}}">
+                    <setBody id="setBody-for-openapi-document">
                         <simple>resource:classpath:openapi.json</simple>
                     </setBody>
                 </route>
@@ -45,13 +45,13 @@
         </route>
         {{/directEndpoints}}
 
-        <route id="route-{{uuid}}">
-            <from id="from-{{uuid}}" uri="direct:501"/>
-            <log id="log-{{uuid}}" message="API operation not yet implemented: ${headers.CamelHttpMethod} ${headers.CamelHttpPath}"/>
-            <setHeader id="setHeader-{{uuid}}" headerName="Exchange.HTTP_RESPONSE_CODE">
+        <route id="route-for-unimplemented-operations">
+            <from id="from-for-unimplemented-operations-route" uri="direct:501"/>
+            <log id="log-for-unimplemented-operations-route" message="API operation not yet implemented: ${headers.CamelHttpMethod} ${headers.CamelHttpPath}"/>
+            <setHeader id="setHeader-for-unimplemented-operations-route" headerName="Exchange.HTTP_RESPONSE_CODE">
                 <constant>501</constant>
             </setHeader>
-            <setBody id="setBody-{{uuid}}">
+            <setBody id="setBody-for-unimplemented-operations-route">
                 <simple>API operation not implemented: ${headers.CamelHttpMethod} ${headers.CamelHttpPath}</simple>
             </setBody>
         </route>
