@@ -17,6 +17,8 @@ package com.redhat.fuse.apicurio.jaxrs.tests;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
@@ -48,28 +50,40 @@ public class GenerateFuseProjectResourceTest {
 	 */
 	private String getRestDSLXMLFromSwagger(String filePath) throws Exception {
 		GenerateFuseProjectResource generator = new GenerateFuseProjectResource();
+		final Swagger swagger = getSwaggerFile(filePath);
+		assertNotNull(swagger);
+
+		String title = "Example";
+		if (swagger.getInfo() != null && swagger.getInfo().getTitle() != null) {
+			title = swagger.getInfo().getTitle();
+		}
+		String artifactId = title.toLowerCase().replaceAll("[^a-zA-Z0-9-_]+", "-").replaceAll("-+", "-");
+
+		HashMap<String, Object> variables = new HashMap<>();
+		variables.put("swagger", swagger);
+		variables.put("title", title);
+		variables.put("artifactId", artifactId);
+		variables.put("fuseVersion", GenerateFuseProjectResource.FUSE_VERSION);
+
+		return generator.generateCamelContextXML(variables);
+	}
+
+	private Swagger getSwaggerFile(String filePath) throws Exception {
 		File swaggerFile = new File(filePath);
 		assertTrue(swaggerFile.exists());
 
 		try (InputStream openapiDoc = new FileInputStream(swaggerFile)) {
 			String rawText = readUTF8(openapiDoc);
-
-			final Swagger swagger = new SwaggerParser().read(Json.mapper().readTree(rawText));
-
-			String title = "Example";
-			if (swagger.getInfo() != null && swagger.getInfo().getTitle() != null) {
-				title = swagger.getInfo().getTitle();
-			}
-			String artifactId = title.toLowerCase().replaceAll("[^a-zA-Z0-9-_]+", "-").replaceAll("-+", "-");
-
-			HashMap<String, Object> variables = new HashMap<>();
-			variables.put("swagger", swagger);
-			variables.put("title", title);
-			variables.put("artifactId", artifactId);
-			variables.put("fuseVersion", GenerateFuseProjectResource.FUSE_VERSION);
-
-			return generator.generateCamelContextXML(variables);
+			Swagger swagger = 
+					new SwaggerParser().read(Json.mapper().readTree(rawText));
+			return swagger;
 		}
+	}
+
+	private Swagger getCleanedUpSwagger(String filePath) throws Exception {
+		GenerateFuseProjectResource generator = new GenerateFuseProjectResource();
+		final Swagger initialSwagger = getSwaggerFile(filePath);
+		return generator.cleanupSwaggerFile(initialSwagger);
 	}
 
 	/**
@@ -101,6 +115,14 @@ public class GenerateFuseProjectResourceTest {
 		String camelContextXML = getRestDSLXMLFromSwagger("src/test/resources/simple-swagger.json");
 		assertTrue(camelContextXML != null);
 		assertTrue(camelContextXML.trim().length() > 0);
+	}
+	
+	@Test
+	public void testForRemovedHostAndSchemesFromSwagger() throws Exception {
+		Swagger swagger = getCleanedUpSwagger("src/test/resources/todo-swagger.json");
+		assertNotNull(swagger);
+		assertNull(swagger.getHost());
+		assertNull(swagger.getSchemes());
 	}
 
 	private static String readUTF8(InputStream is) throws IOException {

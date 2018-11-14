@@ -113,8 +113,9 @@ public class GenerateFuseProjectResource {
     @Path(value = "/camel-project.zip")
     public InputStream generate(String openapiDoc) throws Exception {
 
-        final Swagger swagger = new SwaggerParser().read(Json.mapper().readTree(openapiDoc));
-
+        final Swagger initialSwagger = new SwaggerParser().read(Json.mapper().readTree(openapiDoc));
+        final Swagger swagger = cleanupSwaggerFile(initialSwagger);
+        
         GenericArchive archive = ShrinkWrap.create(GenericArchive.class, "camel-project.zip");
 
         String title = "Example";
@@ -140,7 +141,8 @@ public class GenerateFuseProjectResource {
 
         String camelContextXML = generateCamelContextXML(variables);
         archive.add(new StringAsset(camelContextXML), "src/main/resources/spring/camel-context.xml");
-        archive.add(new StringAsset(openapiDoc), "src/main/resources/openapi.json");
+        
+        archive.add(new StringAsset(Json.pretty(swagger)), "src/main/resources/openapi.json");
 
         return archive.as(ZipExporter.class).exportAsInputStream();
     }
@@ -244,5 +246,13 @@ public class GenerateFuseProjectResource {
 
     static private void addStaticResource(GenericArchive archive, String fileName) {
         archive.add(new ClassLoaderAsset("camel-project-template/" + fileName), fileName);
+    }
+
+    public Swagger cleanupSwaggerFile(Swagger swagger) throws Exception {
+    	if (swagger != null) {
+    		swagger.setHost(null);
+    		swagger.setSchemes(null);
+    	}
+        return swagger;
     }
 }
