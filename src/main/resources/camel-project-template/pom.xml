@@ -147,6 +147,16 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
+		<repository>
+			<id>jboss-ea</id>
+			<url>https://repository.jboss.org/nexus/content/groups/ea</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
 	</repositories>
 
 	<pluginRepositories>
@@ -181,6 +191,17 @@
 			<releases>
 				<enabled>true</enabled>
 				<updatePolicy>never</updatePolicy>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+
+		<pluginRepository>
+			<id>jboss-ea</id>
+			<url>https://origin-repository.jboss.org/nexus/content/groups/ea</url>
+			<releases>
+				<enabled>true</enabled>
 			</releases>
 			<snapshots>
 				<enabled>false</enabled>
