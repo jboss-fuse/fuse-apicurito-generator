@@ -34,9 +34,7 @@
             </get>
         </rest>
 
-        <rest id="rest-{{uuid}}" path="{{swagger.basePath}}" bindingMode="json" enableCORS="true">
-        {{& restXML}}
-        </rest>
+    {{& restXML}}
 
         {{#directEndpoints}}
         <route id="route-{{uuid}}">

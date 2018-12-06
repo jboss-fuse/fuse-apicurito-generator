@@ -25,13 +25,11 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -39,6 +37,15 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.generator.swagger.RestDslGenerator;
@@ -51,6 +58,11 @@ import org.jboss.shrinkwrap.api.asset.ClassLoaderAsset;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.springframework.stereotype.Component;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
@@ -72,6 +84,8 @@ public class GenerateFuseProjectResource {
 
     public static final String FUSE_VERSION;
 
+    private static final Pattern LINE_START = Pattern.compile("^", Pattern.MULTILINE);
+
     static {
         String fuseVersion = null;
         try {
@@ -86,7 +100,7 @@ public class GenerateFuseProjectResource {
         }
         FUSE_VERSION = fuseVersion;
     }
-    
+
     Function<String, String> generateuuid = (s) -> UUID.randomUUID().toString();
 
     /**
@@ -115,7 +129,7 @@ public class GenerateFuseProjectResource {
 
         final Swagger initialSwagger = new SwaggerParser().read(Json.mapper().readTree(openapiDoc));
         final Swagger swagger = cleanupSwaggerFile(initialSwagger);
-        
+
         GenericArchive archive = ShrinkWrap.create(GenericArchive.class, "camel-project.zip");
 
         String title = "Example";
@@ -141,7 +155,7 @@ public class GenerateFuseProjectResource {
 
         String camelContextXML = generateCamelContextXML(variables);
         archive.add(new StringAsset(camelContextXML), "src/main/resources/spring/camel-context.xml");
-        
+
         archive.add(new StringAsset(Json.pretty(swagger)), "src/main/resources/openapi.json");
 
         return archive.as(ZipExporter.class).exportAsInputStream();
@@ -151,23 +165,27 @@ public class GenerateFuseProjectResource {
 
         Swagger swagger = (Swagger) variables.get("swagger");
         final CamelContext camel = new DefaultCamelContext();
-        String restXML = RestDslGenerator.toXml(swagger).generate(camel);
+        String restXMLString = RestDslGenerator.toXml(swagger).generate(camel);
 
-        // Trim off the root elements of the generated XML
-        restXML = restXML.trim();
-        restXML = trimPrefix(restXML, "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>").trim();
-        restXML = trimPrefix(restXML, "<rests xmlns=\"http://camel.apache.org/schema/spring\">").trim();
-        restXML = trimSuffix(restXML, "</rests>").trim();
-        restXML = trimPrefix(restXML, "<rest>").trim();
-        restXML = trimSuffix(restXML, "</rest>").trim();
-        restXML = indent(restXML, "    ");
+        Document restXML = parseXmlFrom(restXMLString);
+        NodeList restElements = restXML.getElementsByTagName("rest");
+        if (restElements.getLength() != 1) {
+            throw new IllegalStateException("Expected only one `rest` element to be generated from the OpenAPI specification");
+        }
 
-        variables.put("restXML", restXML);
+        Element rest = (Element) restElements.item(0);
+        rest.setAttribute("id", "rest-" + generateuuid.apply(null));
+        rest.setAttribute("bindingMode", "json");
+        rest.setAttribute("enableCORS", "true");
+
+        String serialized = serializeElement(rest);
+        String idented = LINE_START.matcher(serialized).replaceAll("    ");
+        variables.put("restXML", idented);
 
         // Extract the direct endpoint names..
         // <to uri="direct:updateUser"/>
         ArrayList<String> directEndpoints = new ArrayList<>();
-        for (String line : restXML.split("\n")) {
+        for (String line : restXMLString.split("\n")) {
             Matcher matcher = Pattern.compile(".*?<to uri=\"(direct:[^\"]+)\"/>.*", Pattern.DOTALL).matcher(line);
             if (matcher.matches()) {
                 directEndpoints.add(matcher.group(1));
@@ -175,33 +193,6 @@ public class GenerateFuseProjectResource {
         }
         variables.put("directEndpoints", directEndpoints);
         return renderTemplateResource("src/main/resources/spring/camel-context.xml", variables);
-    }
-
-    private String indent(String text, String linePrefix) {
-        return Arrays.asList(text.split("\n"))
-                .stream()
-                .map(line -> linePrefix + line)
-                .collect(Collectors.joining("\n"));
-    }
-
-    private static String trimSuffix(String value, String suffix) {
-        if (value == null || suffix == null) {
-            return null;
-        }
-        if (value.endsWith(suffix)) {
-            return value.substring(0, value.length() - suffix.length());
-        }
-        return value;
-    }
-
-    private static String trimPrefix(String value, String prefix) {
-        if (value == null || prefix == null) {
-            return null;
-        }
-        if (value.startsWith(prefix)) {
-            return value.substring(prefix.length());
-        }
-        return value;
     }
 
     static private void addTemplateResource(GenericArchive archive, String fileName, Object context) throws IOException {
@@ -248,11 +239,33 @@ public class GenerateFuseProjectResource {
         archive.add(new ClassLoaderAsset("camel-project-template/" + fileName), fileName);
     }
 
+    private static Document parseXmlFrom(String xml) {
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        //documentBuilderFactory.setNamespaceAware(true);
+        try {
+            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+
+            return documentBuilder.parse(new InputSource(new StringReader(xml)));
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            throw new IllegalArgumentException("The given xml cannot be parsed", e);
+        }
+    }
+
+    private String serializeElement(Element rest) throws TransformerException {
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        Transformer transformer = transformerFactory.newTransformer();
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+        StringWriter serialized = new StringWriter();
+        transformer.transform(new DOMSource(rest), new StreamResult(serialized));
+
+        return serialized.toString();
+    }
+
     public Swagger cleanupSwaggerFile(Swagger swagger) throws Exception {
-    	if (swagger != null) {
-    		swagger.setHost(null);
-    		swagger.setSchemes(null);
-    	}
+        if (swagger != null) {
+            swagger.setHost(null);
+            swagger.setSchemes(null);
+        }
         return swagger;
     }
 }
