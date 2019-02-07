@@ -28,7 +28,7 @@
                         <constant>application/vnd.oai.openapi+json</constant>
                     </setHeader>
                     <setBody id="setBody-for-openapi-document">
-                        <simple>resource:classpath:openapi.json</simple>
+                        <constant>resource:classpath:openapi.json</constant>
                     </setBody>
                 </route>
             </get>
