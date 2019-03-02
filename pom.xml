@@ -15,7 +15,7 @@
 
 	<groupId>org.jboss.redhat-fuse.apicurio</groupId>
 	<artifactId>fuse-apicurito-generator</artifactId>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.0.0.fuse-730039</version>
 
 	<name>Fuse Apicurito Generator</name>
 	<description>An Apicurito generator for Fuse Projects</description>
