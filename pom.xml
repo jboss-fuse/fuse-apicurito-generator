@@ -32,6 +32,10 @@
 
 		<fuse.version>7.7.0.fuse-sb2-770008</fuse.version>
 		<camel.version>2.23.2.fuse-780002</camel.version>
+
+		<version.org.jboss.shrinkwrap.shrinkwrap-impl-base>1.2.6</version.org.jboss.shrinkwrap.shrinkwrap-impl-base>
+		<version.org.jboss.shrinkwrap.shrinkwrap-api>1.2.6</version.org.jboss.shrinkwrap.shrinkwrap-api>
+
 		<snakeyaml.version>1.18</snakeyaml.version>
 		<junit.version>4.12</junit.version>
 
@@ -369,10 +373,12 @@
 		<dependency>
 			<groupId>org.jboss.shrinkwrap</groupId>
 			<artifactId>shrinkwrap-impl-base</artifactId>
+			<version>${version.org.jboss.shrinkwrap.shrinkwrap-impl-base}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jboss.shrinkwrap</groupId>
 			<artifactId>shrinkwrap-api</artifactId>
+			<version>${version.org.jboss.shrinkwrap.shrinkwrap-api}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.camel</groupId>
