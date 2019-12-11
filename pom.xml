@@ -34,7 +34,7 @@
 		<camel.version>2.21.0.fuse-740028</camel.version>
 		<snakeyaml.version>1.18</snakeyaml.version>
 		<junit.version>4.12</junit.version>
-
+                <logback.version>1.2.3</logback.version>
 	</properties>
 
 	<repositories>
@@ -300,6 +300,16 @@
 				<version>${fuse.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>ch.qos.logback</groupId>
+				<artifactId>logback-classic</artifactId>
+				<version>${logback.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>ch.qos.logback</groupId>
+				<artifactId>logback-core</artifactId>
+				<version>${logback.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
