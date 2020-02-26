@@ -18,13 +18,13 @@ configured to use.
 ## Testing with Curl
 
 Assuming you create an open OpenAPI file called `api.json` and you want
-to generate file called `example.zip`, then you would run the following:
+to generate a file called `example.zip`, then you would run the following: 
 
      curl -s -X POST -H "Content-Type: application/json" \
           -d @api.json http://localhost:8080/api/v1/generate/camel-project.zip \
           -o example.zip
 
-If you want to just test against the Swagger Petstore API, you run:
+If you want to just test against the Swagger Petstore API, you run: 
 
      curl -s http://localhost:8080/api/v1/generate/camel-project.zip \
           -o example.zip
