@@ -145,6 +145,23 @@ public class GenerateFuseProjectResourceTest {
         validator.validate(new StreamSource(new StringReader(camelContextXML)));
     }
 
+    /**
+     * Ensure there are no duplicates context paths for openapi.json
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testForDuplicateOpenapiContextPathsInGeneratedRestDSLOutput() throws Exception {
+        String camelContextXML = getRestDSLXMLFromSwagger("src/test/resources/petstore-swagger.json");
+        assertTrue(camelContextXML != null);
+        assertTrue(camelContextXML.trim().length() > 0);
+        int openapiPaths = StringUtils.countMatches(camelContextXML, "uri=\"openapi.json\"");
+        openapiPaths += StringUtils.countMatches(camelContextXML, "uri=\"/openapi.json\"");
+        openapiPaths += StringUtils.countMatches(camelContextXML, "apiContextPath=\"/openapi.json\"");
+        openapiPaths += StringUtils.countMatches(camelContextXML, "apiContextPath=\"openapi.json\"");
+        assertTrue("Too much context paths registered for openapi.json, there must be at most one.", openapiPaths <= 1);
+    }
+
     private static String readUTF8(InputStream is) throws IOException {
         if (is == null) {
             return null;
