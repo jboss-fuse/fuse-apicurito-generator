@@ -15,7 +15,7 @@
 
 	<groupId>org.jboss.redhat-fuse.apicurio</groupId>
 	<artifactId>fuse-apicurito-generator</artifactId>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.0.0.fuse-7_10_0-00005</version>
 
 	<name>Fuse Apicurito Generator</name>
 	<description>An Apicurito generator for Fuse Projects</description>
@@ -30,8 +30,8 @@
 		<!-- Build properties (overridable in profiles) -->
 <!--		<enforcer.pluginVersions.banSnapshots>false</enforcer.pluginVersions.banSnapshots>-->
 
-		<fuse.version>7.8.0.fuse-sb2-780038-redhat-00001</fuse.version>
-		<camel.version>2.23.2.fuse-780036-redhat-00001</camel.version>
+		<fuse.version>7.10.0.fuse-sb2-7_10_0-00005</fuse.version>
+		<camel.version>2.23.2.fuse-7_10_0-00007</camel.version>
 
 		<version.org.jboss.shrinkwrap.shrinkwrap-impl-base>1.2.6</version.org.jboss.shrinkwrap.shrinkwrap-impl-base>
 		<version.org.jboss.shrinkwrap.shrinkwrap-api>1.2.6</version.org.jboss.shrinkwrap.shrinkwrap-api>
