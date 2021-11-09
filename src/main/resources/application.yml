@@ -26,10 +26,11 @@ server:
     workerThreads: 10
 
 management:
-  port: 8181
-  undertow:
-    ioThreads: 1
-    workerThreads: 1
+  server:
+    port: 8181
+    undertow:
+      ioThreads: 1
+      workerThreads: 1
 
 cors:
   allowedOrigins: "*"
