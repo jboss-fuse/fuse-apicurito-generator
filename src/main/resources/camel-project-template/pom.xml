@@ -96,7 +96,7 @@
 
 			<plugin>
 				<groupId>org.jboss.redhat-fuse</groupId>
-				<artifactId>fabric8-maven-plugin</artifactId>
+				<artifactId>openshift-maven-plugin</artifactId>
 				<version>${fuse.version}</version>
 				<executions>
 					<execution>
