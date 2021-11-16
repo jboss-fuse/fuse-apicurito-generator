@@ -17,7 +17,7 @@ Getting the API docs:
 
 ## Running on OpenShift
 
-    mvn fabric8:deploy
+    mvn oc:deploy
 
 You can expose the service externally using the following command:
 
