@@ -37,7 +37,7 @@
 		<version.org.jboss.shrinkwrap.shrinkwrap-api>1.2.6</version.org.jboss.shrinkwrap.shrinkwrap-api>
 
 		<snakeyaml.version>1.28</snakeyaml.version>
-		<junit.version>4.12</junit.version>
+		<junit.version>4.13.2</junit.version>
 
 	</properties>
 
