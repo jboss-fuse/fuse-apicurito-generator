@@ -36,7 +36,7 @@
 		<version.org.jboss.shrinkwrap.shrinkwrap-impl-base>1.2.6</version.org.jboss.shrinkwrap.shrinkwrap-impl-base>
 		<version.org.jboss.shrinkwrap.shrinkwrap-api>1.2.6</version.org.jboss.shrinkwrap.shrinkwrap-api>
 
-		<snakeyaml.version>1.32.0.redhat-00001</snakeyaml.version>
+		<snakeyaml.version>1.33.0.redhat-00001</snakeyaml.version>
 		<junit.version>4.13.2</junit.version>
 
 	</properties>
