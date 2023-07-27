@@ -30,13 +30,13 @@
 		<!-- Build properties (overridable in profiles) -->
 <!--		<enforcer.pluginVersions.banSnapshots>false</enforcer.pluginVersions.banSnapshots>-->
 
-		<fuse.version>7.12.0.fuse-7_12_0-00016</fuse.version>
-		<camel.version>2.23.2.fuse-7_12_0-00019</camel.version>
+		<fuse.version>7.12.0.fuse-7_12_0-00016-redhat-00001</fuse.version>
+		<camel.version>2.23.2.fuse-7_12_0-00019-redhat-00001</camel.version>
 
-		<version.org.jboss.shrinkwrap.shrinkwrap-impl-base>1.2.6</version.org.jboss.shrinkwrap.shrinkwrap-impl-base>
-		<version.org.jboss.shrinkwrap.shrinkwrap-api>1.2.6</version.org.jboss.shrinkwrap.shrinkwrap-api>
+		<version.org.jboss.shrinkwrap.shrinkwrap-impl-base>1.2.6.redhat-00120</version.org.jboss.shrinkwrap.shrinkwrap-impl-base>
+		<version.org.jboss.shrinkwrap.shrinkwrap-api>1.2.6.redhat-00120</version.org.jboss.shrinkwrap.shrinkwrap-api>
 
-		<snakeyaml.version>1.33.0.redhat-00001</snakeyaml.version>
+		<snakeyaml.version>1.33.0.redhat-00002</snakeyaml.version>
 		<junit.version>4.13.2</junit.version>
 
 	</properties>
@@ -349,7 +349,7 @@
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>20.0</version>
+			<version>20.0.0.redhat-1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.yaml</groupId>
